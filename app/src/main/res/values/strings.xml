@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GiraMondo20app</string>
+    <string name="fragment_filter_for">Filtra per</string>
+    <string name="fragment_filter_for_travel">Tipo di viaggio</string>
+</resources>
