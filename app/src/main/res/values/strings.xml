@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">GiraMondo20app</string>
     <string name="fragment_filter_for">Filtra per</string>
-    <string name="fragment_filter_for_travel">Tipo di viaggio</string>
+    <string name="fragment_filter_for_price">Range di prezzo</string>
 </resources>

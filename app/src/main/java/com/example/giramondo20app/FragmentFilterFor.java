@@ -29,13 +29,16 @@ public class FragmentFilterFor extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final TextView textView;
-        SeekBar seekBar;
+        final TextView textView1;
+              SeekBar seekBar;
+
         View rootView= inflater.inflate(R.layout.fragment_filter_for, container, false);
-         seekBar = rootView.findViewById(R.id.seekBar);
-            textView= rootView.findViewById(R.id.textView);
-            seekBar.setMax(500);
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+        seekBar = rootView.findViewById(R.id.seekBar);
+        textView1= rootView.findViewById(R.id.textView1);
+        seekBar.setMax(500);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
@@ -49,7 +52,8 @@ public class FragmentFilterFor extends Fragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
                     int myProgress= progress;
-                    textView.setText("progress value"+ myProgress + "+" + seekBar.getMax());
+                    textView1.setText("" + myProgress);
+
 
                 }
             });
