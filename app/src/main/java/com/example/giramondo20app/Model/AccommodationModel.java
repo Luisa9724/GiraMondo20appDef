@@ -5,7 +5,7 @@ import java.util.List;
 
 public class AccommodationModel {
     private String Name;
-    private float Rating;
+    private double Rating;
     private int Price;
     private String Description;
     private String Services;
@@ -15,13 +15,13 @@ public class AccommodationModel {
     private List<PhotoModel> Photos;
     private int[] Stars ={1,2,3,4,5};
 
-    public AccommodationModel(String name,float rating, int price) {
+    public AccommodationModel(String name,double rating, int price) {
         Name = name;
         Rating = rating;
         Price = price;
     }
 
-    public AccommodationModel(String name,float rating, int price, String description, String services, boolean prefered, String city, String state, List<PhotoModel> photos, int[] stars) {
+    public AccommodationModel(String name,double rating, int price, String description, String services, boolean prefered, String city, String state, List<PhotoModel> photos, int[] stars) {
         Name = name;
         Rating = rating;
         Price = price;
@@ -34,7 +34,7 @@ public class AccommodationModel {
         Stars = stars;
     }
 
-    public AccommodationModel(String name, float rating, int price, String description, String services, boolean prefered, String city, String state, List<PhotoModel> photos) {
+    public AccommodationModel(String name, double rating, int price, String description, String services, boolean prefered, String city, String state, List<PhotoModel> photos) {
         Name = name;
         Rating = rating;
         Price = price;
@@ -54,7 +54,7 @@ public class AccommodationModel {
         Name = name;
     }
 
-    public float getRating() {
+    public double getRating() {
         return Rating;
     }
 

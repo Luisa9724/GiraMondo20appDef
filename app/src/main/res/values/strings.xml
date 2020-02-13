@@ -2,4 +2,7 @@
     <string name="app_name">GiraMondo20app</string>
     <string name="fragment_filter_for">Filtra per</string>
     <string name="fragment_filter_for_price">Range di prezzo</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

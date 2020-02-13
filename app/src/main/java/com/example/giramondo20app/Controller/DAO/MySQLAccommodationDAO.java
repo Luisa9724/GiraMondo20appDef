@@ -11,19 +11,34 @@ import java.util.List;
 
 public class MySQLAccommodationDAO implements AccommodationDAO {
 
-    public List<AccommodationModel> getAccomodationsPerPriceRange(int priceRange){
+    public List<AccommodationModel> getAccomodationsPerPriceRange(Integer priceRange){
         List<AccommodationModel> Results = new ArrayList<>();
         DatabaseController.connect();
-        try {
-            PreparedStatement ps = DatabaseController.getConnection().prepareStatement("SELECT NAME,RATING,PRICE,PHOTOS FROM ACCOMMODATION WHERE PRICE <= ? ORDER BY RATING");
-            ps.setInt(1, priceRange);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Results.add(new AccommodationModel(rs.getString(1), rs.getFloat(2), priceRange));
+        if(priceRange<500) {
+            try {
+                PreparedStatement ps = DatabaseController.getConnection().prepareStatement("SELECT NAME,RATING,PRICE FROM ACCOMMODATION WHERE PRICE <= ? ORDER BY RATING");
+                ps.setInt(1, priceRange);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    Results.add(new AccommodationModel(rs.getString(1), rs.getDouble(2), rs.getInt(3)));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }else if(priceRange==500){
+            try {
+                PreparedStatement ps = DatabaseController.getConnection().prepareStatement("SELECT NAME,RATING,PRICE FROM ACCOMMODATION WHERE PRICE >= ? ORDER BY RATING");
+                ps.setInt(1, priceRange);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    Results.add(new AccommodationModel(rs.getString(1), rs.getDouble(2), rs.getInt(3)));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
         }
+            DatabaseController.disconnect();
         return Results;
     }
 }

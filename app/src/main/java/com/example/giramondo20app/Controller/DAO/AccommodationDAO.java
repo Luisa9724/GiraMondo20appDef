@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface AccommodationDAO {
 
-    public List<AccommodationModel> getAccomodationsPerPriceRange(int priceRange);
+    public List<AccommodationModel> getAccomodationsPerPriceRange(Integer priceRange);
 }
