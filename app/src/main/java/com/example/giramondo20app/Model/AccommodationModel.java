@@ -1,50 +1,115 @@
 package com.example.giramondo20app.Model;
 
 
-import java.util.List;
+import java.io.Serializable;
 
-public class AccommodationModel {
+public class AccommodationModel implements Serializable {
     private String Name;
-    private double Rating;
+    private float Rating;
     private int Price;
+    private byte[] Photo;
     private String Description;
-    private String Services;
-    private boolean Prefered;
     private String City;
     private String State;
-    private List<PhotoModel> Photos;
-    private int[] Stars ={1,2,3,4,5};
+    private String Address;
+    private String Services;
+    private String TravelType;
+    private String AccommodationType;
+    private String SubCategoryRestaurant;
+    private String SubCategoryHotel;
+    private String SubCategoryAttraction;
 
-    public AccommodationModel(String name,double rating, int price) {
+    public AccommodationModel(String name, float rating, int price, byte[] photo, String description, String city, String state, String address, String services) {
         Name = name;
         Rating = rating;
         Price = price;
-    }
-
-    public AccommodationModel(String name,double rating, int price, String description, String services, boolean prefered, String city, String state, List<PhotoModel> photos, int[] stars) {
-        Name = name;
-        Rating = rating;
-        Price = price;
+        Photo = photo;
         Description = description;
-        Services = services;
-        Prefered = prefered;
         City = city;
         State = state;
-        Photos = photos;
-        Stars = stars;
+        Address = address;
+        Services = services;
     }
 
-    public AccommodationModel(String name, double rating, int price, String description, String services, boolean prefered, String city, String state, List<PhotoModel> photos) {
+
+
+
+    public AccommodationModel(String name,float rating, int price, byte[] photo) {
         Name = name;
         Rating = rating;
         Price = price;
+        Photo = photo;
+    }
+
+
+    public AccommodationModel(String name,String address) {
+        Name = name;
+        Address = address;
+    }
+
+    public AccommodationModel(String name, float rating, int price, byte[] photo, String description, String city, String state, String address, String services, String accommodationType) {
+        Name = name;
+        Rating = rating;
+        Price = price;
+        Photo = photo;
         Description = description;
-        Services = services;
-        Prefered = prefered;
         City = city;
         State = state;
-        Photos = photos;
+        Address = address;
+        Services = services;
+        AccommodationType = accommodationType;
     }
+
+
+    public String getAddress() {
+        return Address;
+    }
+
+    public void setAddress(String address) {
+        Address = address;
+    }
+
+    public String getTravelType() {
+        return TravelType;
+    }
+
+    public void setTravelType(String travelType) {
+        TravelType = travelType;
+    }
+
+    public String getAccommodationType() {
+        return AccommodationType;
+    }
+
+    public void setAccommodationType(String accommodationType) {
+        AccommodationType = accommodationType;
+    }
+
+    public String getSubCategoryRestaurant() {
+        return SubCategoryRestaurant;
+    }
+
+    public void setSubCategoryRestaurant(String subCategoryRestaurant) {
+        SubCategoryRestaurant = subCategoryRestaurant;
+    }
+
+    public String getSubCategoryHotel() {
+        return SubCategoryHotel;
+    }
+
+    public void setSubCategoryHotel(String subCategoryHotel) {
+        SubCategoryHotel = subCategoryHotel;
+    }
+
+    public String getSubCategoryAttraction() {
+        return SubCategoryAttraction;
+    }
+
+    public void setSubCategoryAttraction(String subCategoryAttraction) {
+        SubCategoryAttraction = subCategoryAttraction;
+    }
+
+
 
     public String getName() {
         return Name;
@@ -54,7 +119,7 @@ public class AccommodationModel {
         Name = name;
     }
 
-    public double getRating() {
+    public float getRating() {
         return Rating;
     }
 
@@ -86,14 +151,6 @@ public class AccommodationModel {
         Services = services;
     }
 
-    public boolean isPrefered() {
-        return Prefered;
-    }
-
-    public void setPrefered(boolean prefered) {
-        Prefered = prefered;
-    }
-
     public String getCity() {
         return City;
     }
@@ -110,19 +167,11 @@ public class AccommodationModel {
         State = state;
     }
 
-    public List<PhotoModel> getPhotos() {
-        return Photos;
+    public byte[] getPhoto() {
+        return Photo;
     }
 
-    public void setPhotos(List<PhotoModel> photos) {
-        Photos = photos;
-    }
-
-    public int[] getStars() {
-        return Stars;
-    }
-
-    public void setStars(int[] stars) {
-        Stars = stars;
+    public void setPhoto(byte[] photo) {
+        Photo = photo;
     }
 }

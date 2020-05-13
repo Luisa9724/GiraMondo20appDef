@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/logoLayout">
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/globe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#617EAE"
+        android:src="@drawable/globe" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/entra"
+        android:background="@android:color/holo_orange_dark"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignTop="@+id/mondo"
+        android:background="@android:color/holo_orange_dark"/>
+
+    <TextView
+        android:id="@+id/entra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="117dp"
+        android:layout_centerHorizontal="true"
+        android:text="Benvenuto"
+        android:textAllCaps="false"
+        android:textColor="@color/textColorPrimary"
+        android:textStyle="bold"
+        android:textSize="30sp"/>
+    <TextView
+        android:id="@+id/mondo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="570dp"
+        android:layout_centerHorizontal="true"
+        android:text="GiraMondo"
+        android:textAllCaps="false"
+        android:textColor="@color/textColorPrimary"
+        android:textStyle="bold"
+        android:textSize="30sp"/>
+
+</RelativeLayout>

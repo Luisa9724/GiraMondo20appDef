@@ -1,7 +1,11 @@
 <resources>
-    <string name="app_name">GiraMondo20app</string>
-    <string name="fragment_filter_for">Filtra per</string>
-    <string name="fragment_filter_for_price">Range di prezzo</string>
+    <string name="app_name">GiraMondo</string>
+    <string name="map_key" translatable="false">AIzaSyCKwijDzLEFdWueNmOAAJD0ADfnELHBlKY</string>
+    <string-array name="place_type_name">
+        <item>Hotel</item>
+        <item>Ristoranti</item>
+        <item>Cose da fare</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

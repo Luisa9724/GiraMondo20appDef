@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/destinazione"
+        android:queryHint="Dove vuoi andare?"
+        android:layout_marginTop="70dp"
+        android:iconifiedByDefault="false"
+        android:background="@drawable/button_border"/>
+    <Button
+        android:id="@+id/position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_below="@+id/destinazione"
+        android:padding="10dp"
+        android:layout_centerHorizontal="true"
+        android:drawableStart="@drawable/ic_location_24dp"
+        android:text="Usa la posizione attuale"
+        android:textAllCaps="false"
+        android:textSize="17sp"
+        android:textStyle="bold|italic"
+        android:backgroundTint="@android:color/transparent"
+        android:background="?android:attr/selectableItemBackground"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="40dp"
+        android:layout_below="@id/position">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/adviseHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Da non perdere...."
+                android:textSize="25sp"
+                android:textColor="@color/colorPrimary"/>
+            <TextView
+                android:id="@+id/adviseHotels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/adviseHome"
+                android:layout_marginTop="20dp"
+                android:text="Hotel più gettonati al mondo"
+                android:textSize="20sp"
+                android:textColor="@android:color/holo_blue_dark"/>
+            <ListView
+                android:id="@+id/hotelListHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/adviseHotels"
+                android:layout_marginTop="20dp"/>
+
+            <TextView
+                android:id="@+id/adviseRestaurants"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/hotelListHome"
+                android:layout_marginTop="40dp"
+                android:text="Ristoranti più rinomati al mondo"
+                android:textSize="20sp"
+                android:textColor="@android:color/holo_blue_dark"/>
+
+            <ListView
+                android:id="@+id/restaurantListHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/adviseRestaurants"/>
+            <TextView
+                android:id="@+id/adviseAttractions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/restaurantListHome"
+                android:layout_marginTop="40dp"
+                android:text="Attrazioni da visitare nel mondo"
+                android:textSize="20sp"
+                android:textColor="@android:color/holo_blue_dark"/>
+            <ListView
+                android:id="@+id/attractionListHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/adviseAttractions"
+                android:layout_marginTop="40dp"/>
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

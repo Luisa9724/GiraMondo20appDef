@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<item android:id="@+id/option_name"
+    android:title="Nome"
+    app:showAsAction="never"/>
+    <item android:id="@+id/option_price"
+        android:title="Prezzo"
+        app:showAsAction="never"/>
+    <item android:id="@+id/option_rating"
+        android:title="Valutazione"
+        app:showAsAction="never"/>
+</menu>
