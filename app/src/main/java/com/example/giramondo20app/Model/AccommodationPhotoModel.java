@@ -1,7 +1,8 @@
 package com.example.giramondo20app.Model;
 
 public class AccommodationPhotoModel {
-    byte[] file;
+
+    private  byte[] file;
 
     public AccommodationPhotoModel(byte[] file) {
         this.file = file;
@@ -11,7 +12,7 @@ public class AccommodationPhotoModel {
         return file;
     }
 
-    public void setFile(byte[] file) {
+ /*   public void setFile(byte[] file) {
         this.file = file;
-    }
+    }*/
 }

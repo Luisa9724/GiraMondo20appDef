@@ -13,12 +13,11 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.Gravity;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
 
 import com.example.giramondo20app.Model.ReviewModel;
 
@@ -27,7 +26,7 @@ import java.util.List;
 
 public class FragmentUserReviews extends Fragment implements  OnTaskCompletedUserReviews {
 
-    RecyclerView userReviews;
+    private RecyclerView userReviews;
     Context mContext;
 
 

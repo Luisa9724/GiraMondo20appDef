@@ -17,21 +17,20 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -39,40 +38,39 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.giramondo20app.Model.ReviewModel;
-
-import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
 public class FragmentProfile extends Fragment implements OnTaskCompletedUserProfile,OnTaskCompletedReviewForm {
 
-    String usernameStored;
-    String surnameStored;
-    String nicknameStored;
-    String birthdayStored;
-    String emailStored ;
-    String passwordStored;
-    boolean nameIsVisibleStored;
-    byte[] userImageStored;
-    boolean photoApprovedStored;
+    private String usernameStored;
+    private String surnameStored;
+    private String nicknameStored;
+    private String birthdayStored;
+    private String emailStored;
+    private boolean nameIsVisibleStored;
+    private byte[] userImageStored;
+    private boolean photoApprovedStored;
 
-    Uri imageUri;
+    private Uri imageUri;
 
-    ImageView userImageView;
-    TextView tvShowPhoto;
-    TextView tvWrittenReviews;
-    TextView tvAVGUserRating;
+    private ImageView userImageView;
+    private TextView tvShowPhoto;
+    private TextView tvWrittenReviews;
+    private TextView tvAVGUserRating;
 
     Context mContext;
 
-    FragmentProfile( String usernameStored,String surnameStored,String nicknameStored,String birthdayStored,String emailStored,String passwordStored,boolean nameIsVisibleStored,byte[] userImageStored,boolean photoApprovedStored){
+    private Animation animRotate;
+    private ImageView imgRefresh;
+
+
+    FragmentProfile( String usernameStored,String surnameStored,String nicknameStored,String birthdayStored,String emailStored,boolean nameIsVisibleStored,byte[] userImageStored,boolean photoApprovedStored){
         this.usernameStored = usernameStored;
         this.surnameStored = surnameStored;
         this.nicknameStored = nicknameStored;
         this.birthdayStored = birthdayStored;
         this.emailStored = emailStored;
-        this.passwordStored = passwordStored;
         this.nameIsVisibleStored = nameIsVisibleStored;
         this.userImageStored = userImageStored;
         this.photoApprovedStored = photoApprovedStored;
@@ -112,6 +110,9 @@ public class FragmentProfile extends Fragment implements OnTaskCompletedUserProf
         swipeRefreshLayout.setProgressViewOffset(false,10,100);
 
         boolean photoUpdated = showUserImageIfItIsPossible(userImageStored);
+
+
+        animRotate = AnimationUtils.loadAnimation(mContext,R.anim.rotate);
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -321,18 +322,29 @@ public class FragmentProfile extends Fragment implements OnTaskCompletedUserProf
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull final Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.refresh_menu,menu);
+        imgRefresh = new ImageView(mContext);
+        imgRefresh.setPadding(0,0,15,0);
+        if(imgRefresh != null){
+            imgRefresh.setImageResource(R.drawable.ic_refresh_26dp);
+        }
+        menu.findItem(R.id.option_refresh).setActionView(imgRefresh);
+        imgRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.startAnimation(animRotate);
+
+                AsyncUserProfile task = new AsyncUserProfile(FragmentProfile.this);
+                task.execute(emailStored);
+            }
+        });
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.option_refresh){
-
-            AsyncUserProfile task = new AsyncUserProfile(FragmentProfile.this);
-            task.execute(emailStored);
-
             return true;
         }else{
             return super.onOptionsItemSelected(item);

@@ -2,7 +2,7 @@ package com.example.giramondo20app;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.util.Log;
+
 
 import com.example.giramondo20app.Controller.DAO.AccommodationDAO;
 import com.example.giramondo20app.Controller.DAO.MySQLAccommodationDAO;
@@ -10,18 +10,20 @@ import com.example.giramondo20app.Model.AccommodationModel;
 import com.google.android.gms.maps.GoogleMap;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 
 public class AsyncNearbyPlaces extends AsyncTask<String,Void, HashMap<String,List<AccommodationModel>>> {
-    private WeakReference<Activity> mActivity;
-    OnTaskCompletedPlacesOnMap listener;
-    String selectedItem;
-    GoogleMap mMap;
-    AccommodationModel currentAcm;
 
-    public AsyncNearbyPlaces(Activity activity,Object map,OnTaskCompletedPlacesOnMap listener, String selectedItem, AccommodationModel accommodation){
+    private WeakReference<Activity> mActivity;
+    private OnTaskCompletedPlacesOnMap listener;
+    private String selectedItem;
+    private GoogleMap mMap;
+    private AccommodationModel currentAcm;
+    private AccommodationDAO acmSQL;
+
+    AsyncNearbyPlaces(Activity activity, Object map, OnTaskCompletedPlacesOnMap listener, String selectedItem, AccommodationModel accommodation){
         mActivity = new WeakReference<>(activity);
         this.listener = listener;
         this.selectedItem = selectedItem;
@@ -30,18 +32,18 @@ public class AsyncNearbyPlaces extends AsyncTask<String,Void, HashMap<String,Lis
 
     }
 
+    public AsyncNearbyPlaces() {
+
+    }
+
     @Override
     protected HashMap<String,List<AccommodationModel>> doInBackground(String... strings) {
 
         String city = strings[0];
 
-        HashMap<String,List<AccommodationModel>> results = new HashMap<>();
-        AccommodationDAO acmSQL = new MySQLAccommodationDAO();
-        results.put("hotels", acmSQL.getNearbyHotels(city));
-        results.put("restaurants", acmSQL.getNearbyRestaurants(city));
-        results.put("attractions", acmSQL.getNearbyAttractions(city));
+        setDAO(null);
 
-        return results;
+        return getNearbyAccommodations(city);
     }
 
     @Override
@@ -49,5 +51,27 @@ public class AsyncNearbyPlaces extends AsyncTask<String,Void, HashMap<String,Lis
         final Activity activity = mActivity.get();
         if(activity != null && results != null)
         listener.onTaskCompletePlacesOnMap(results,selectedItem,activity,mMap,currentAcm);
+    }
+
+    public void setDAO(AccommodationDAO acmDAO){
+        if(acmDAO != null) {
+            acmSQL = acmDAO;
+        }else{
+            acmSQL = new MySQLAccommodationDAO();
+        }
+    }
+
+    public HashMap<String,List<AccommodationModel>> getNearbyAccommodations(String location){
+
+        HashMap<String,List<AccommodationModel>> results = new HashMap<>();
+
+        if(location == null)
+            throw new IllegalArgumentException();
+
+        results.put("hotels", acmSQL.getNearbyHotels(location));
+        results.put("restaurants", acmSQL.getNearbyRestaurants(location));
+        results.put("attractions", acmSQL.getNearbyAttractions(location));
+
+        return results;
     }
 }

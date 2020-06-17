@@ -7,9 +7,9 @@ import com.example.giramondo20app.Controller.DAO.ReviewDAO;
 
 public class AsyncReviewForm extends AsyncTask<Void,Void,String> {
 
-    String accommodationName,userEmail,comment,travelType;
-    float quality,position,cleaning,service;
-    Integer idReview;
+    private String accommodationName,userEmail,comment,travelType;
+    private float quality,position,cleaning,service;
+    private Integer idReview;
 
     OnTaskCompletedReviewForm listener;
 
@@ -56,6 +56,7 @@ public class AsyncReviewForm extends AsyncTask<Void,Void,String> {
     @Override
     protected void onPostExecute(String response) {
 
+        if(listener != null)
         listener.onTaskCompleteReviewForm(response);
     }
 }

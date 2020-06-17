@@ -3,35 +3,33 @@ package com.example.giramondo20app.Model;
 import java.util.Date;
 
 public class UserModel {
+
     private byte[] userImage;
     private String username;
     private String surname;
     private Date birthday;
     private String nickname;
     private String email;
-    private String password;
     private boolean nameIsVisible;
     private boolean approved;
 
 
-    public UserModel(String username, String surname, Date birthday, String nickname, String email, String password, boolean nameIsVisible) {
+    public UserModel(String username, String surname, Date birthday, String nickname, String email, boolean nameIsVisible) {
         this.username = username;
         this.surname = surname;
         this.birthday = birthday;
         this.nickname = nickname;
         this.email = email;
-        this.password = password;
         this.nameIsVisible = nameIsVisible;
     }
 
-    public UserModel(String username, String surname, Date birthday, String nickname, String email, String password, boolean nameIsVisible, byte[] userImage,boolean approved) {
+    public UserModel(String username, String surname, Date birthday, String nickname, String email, boolean nameIsVisible, byte[] userImage,boolean approved) {
         this.userImage = userImage;
         this.username = username;
         this.surname = surname;
         this.birthday = birthday;
         this.nickname = nickname;
         this.email = email;
-        this.password = password;
         this.nameIsVisible = nameIsVisible;
         this.approved = approved;
     }
@@ -40,9 +38,9 @@ public class UserModel {
         return username;
     }
 
-    public void setUsername(String username) {
+   /* public void setUsername(String username) {
         this.username = username;
-    }
+    }*/
 
     public String getUserEmail() {
         return email;
@@ -57,56 +55,48 @@ public class UserModel {
         return surname;
     }
 
-    public void setSurname(String surname) {
+   /* public void setSurname(String surname) {
         this.surname = surname;
-    }
+    }*/
 
     public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    /*public void setBirthday(Date birthday) {
         this.birthday = birthday;
-    }
+    }*/
 
     public String getNickname() {
         return nickname;
     }
 
-    public void setNickname(String nickname) {
+   /* public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    }*/
 
     public boolean isNameIsVisible() {
         return nameIsVisible;
     }
 
-    public void setNameIsVisible(boolean nameIsVisible) {
+    /*public void setNameIsVisible(boolean nameIsVisible) {
         this.nameIsVisible = nameIsVisible;
-    }
+    }*/
 
     public byte[] getUserImage() {
         return userImage;
     }
 
-    public void setUserImage(byte[] userImage) {
+   /* public void setUserImage(byte[] userImage) {
         this.userImage = userImage;
-    }
+    }*/
 
     public boolean isApproved() {
         return approved;
     }
 
-    public void setApproved(boolean approved) {
+    /*public void setApproved(boolean approved) {
         this.approved = approved;
-    }
+    }*/
 
 }

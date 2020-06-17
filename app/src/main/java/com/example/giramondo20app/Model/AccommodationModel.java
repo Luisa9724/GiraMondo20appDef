@@ -1,9 +1,11 @@
 package com.example.giramondo20app.Model;
 
 
+
 import java.io.Serializable;
 
 public class AccommodationModel implements Serializable {
+
     private String Name;
     private float Rating;
     private int Price;
@@ -18,6 +20,13 @@ public class AccommodationModel implements Serializable {
     private String SubCategoryRestaurant;
     private String SubCategoryHotel;
     private String SubCategoryAttraction;
+
+
+    public AccommodationModel(String name,String city, String accommodationType){
+        City = city;
+        Name = name;
+        AccommodationType = accommodationType;
+    }
 
     public AccommodationModel(String name, float rating, int price, byte[] photo, String description, String city, String state, String address, String services) {
         Name = name;

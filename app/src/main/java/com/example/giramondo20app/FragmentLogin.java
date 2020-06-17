@@ -11,12 +11,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
+
 import android.widget.Toast;
 
 import com.example.giramondo20app.Model.UserModel;
@@ -28,9 +28,8 @@ import java.util.Arrays;
 
 public class FragmentLogin extends Fragment implements OnTaskCompletedLogin {
 
-    TextInputEditText etEmailLogin;
-    TextInputEditText etPassLogin;
-    Button btnLogin;
+    private TextInputEditText etEmailLogin;
+    private TextInputEditText etPassLogin;
 
     Context mContext;
 
@@ -45,7 +44,7 @@ public class FragmentLogin extends Fragment implements OnTaskCompletedLogin {
 
         etEmailLogin = view.findViewById(R.id.email_login);
         etPassLogin = view.findViewById(R.id.password_login);
-        btnLogin = view.findViewById(R.id.login_btn);
+        Button btnLogin = view.findViewById(R.id.login_btn);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +84,6 @@ public class FragmentLogin extends Fragment implements OnTaskCompletedLogin {
             editor.putString("surname",result.getSurname());
             editor.putString("nick",result.getNickname());
             editor.putString("email",result.getUserEmail());
-            editor.putString("password",result.getPassword());
             editor.putString("birthday",dateFormat.format(result.getBirthday()));
             editor.putBoolean("name_is_visible",result.isNameIsVisible());
             editor.putBoolean("photo_approved",result.isApproved());
@@ -100,7 +98,7 @@ public class FragmentLogin extends Fragment implements OnTaskCompletedLogin {
              FragmentTransaction fragmentTransaction;
              if (fragmentManager != null) {
                 fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, new FragmentProfile(result.getUsername(),result.getSurname(),result.getNickname(),dateFormat.format(result.getBirthday()),result.getUserEmail(),result.getPassword(),result.isNameIsVisible(),result.getUserImage(),result.isApproved()),"frag_profile");
+                fragmentTransaction.replace(R.id.fragment_container, new FragmentProfile(result.getUsername(),result.getSurname(),result.getNickname(),dateFormat.format(result.getBirthday()),result.getUserEmail(),result.isNameIsVisible(),result.getUserImage(),result.isApproved()),"frag_profile");
                 fragmentTransaction.addToBackStack("frag_profile");
                 fragmentTransaction.commit();
              }

@@ -63,13 +63,15 @@ public class FragmentAccommodationInfo extends Fragment {
         mFavouriteButton = view.findViewById(R.id.loveButton);
 
 
-        SharedPreferences pref = getActivity().getSharedPreferences("loginData",MODE_PRIVATE);
-        boolean favourite = pref.getBoolean(accommodation.getName(),false);
+        SharedPreferences pref = getActivity().getSharedPreferences("loginData", MODE_PRIVATE);
+        if (accommodation != null) {
+            boolean favourite = pref.getBoolean(accommodation.getName(), false);
 
-        if(favourite){
-            mFavouriteButton.setChecked(true);
-        }else{
-            mFavouriteButton.setChecked(false);
+            if (favourite) {
+                mFavouriteButton.setChecked(true);
+            } else {
+                mFavouriteButton.setChecked(false);
+            }
         }
 
         if(accommodation != null) {

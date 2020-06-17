@@ -60,6 +60,7 @@ public class AdapterPhotos extends RecyclerView.Adapter<AdapterPhotos.MyViewHold
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true);
         Glide.with(mContext).load(currentPhoto.getFile()).apply(options).into(holder.imageView);
+        if(accommodation != null)
         holder.title.setText(accommodation.getName());
     }
 

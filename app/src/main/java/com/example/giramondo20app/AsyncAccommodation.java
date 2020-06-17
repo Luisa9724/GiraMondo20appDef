@@ -23,7 +23,7 @@ public class AsyncAccommodation extends AsyncTask<String,Void, AccommodationMode
 
     @Override
     protected void onPostExecute(AccommodationModel result) {
-Log.d("luisa",result.getName());
+        if(result != null)
         listener.onTaskCompleteSearchAccommodationByName(result);
     }
 }

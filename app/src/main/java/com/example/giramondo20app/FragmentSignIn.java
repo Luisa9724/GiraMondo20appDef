@@ -1,16 +1,17 @@
 package com.example.giramondo20app;
 
 import android.Manifest;
-import android.app.Activity;
+
 import android.app.DatePickerDialog;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
+
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,19 +48,17 @@ import static android.app.Activity.RESULT_OK;
 
 public class FragmentSignIn extends Fragment implements OnTaskCompletedSignIn {
 
+    private Context mContext;
     private TextView mDisplayDate;
-    private ImageButton mDate;
-    private Button btnSignIn;
     private TextInputEditText etUsername,etSurname,etNickname,etEmail,etPassword;
     private TextInputLayout textInputEmail, textInputPassword;
     private RadioGroup mRadioGroup;
     private ImageView userPhoto;
-    Uri imageUri;
+    private Uri imageUri;
 
-    int year, month, day;
-    Calendar acurentDate;
+    private int year, month, day;
 
-    String nameVisible;
+    private String nameVisible;
 
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
@@ -88,13 +87,13 @@ public class FragmentSignIn extends Fragment implements OnTaskCompletedSignIn {
         textInputEmail = view.findViewById(R.id.text_input_email);
         textInputPassword = view.findViewById(R.id.text_input_pass);
 
-        btnSignIn = view.findViewById(R.id.signIn);
-        mDate = view.findViewById(R.id.today);
+        Button btnSignIn = view.findViewById(R.id.signIn);
+        ImageButton mDate = view.findViewById(R.id.today);
         mDisplayDate = view.findViewById(R.id.tvDate);
         mRadioGroup = view.findViewById(R.id.rad_gr);
         userPhoto = view.findViewById(R.id.user_photo_sign_in);
 
-        acurentDate = Calendar.getInstance();
+        Calendar acurentDate = Calendar.getInstance();
 
         day = acurentDate.get(Calendar.DAY_OF_MONTH);
         month = acurentDate.get(Calendar.MONTH);
@@ -126,13 +125,13 @@ public class FragmentSignIn extends Fragment implements OnTaskCompletedSignIn {
         mDisplayDate.setText(day + "/" + month + "/" + year);
 
         if(imageUri == null){
-            Glide.with(getContext()).load(R.drawable.ic_insert_photo_blue_24dp).into(userPhoto);
+            Glide.with(mContext).load(R.drawable.ic_insert_photo_blue_24dp).into(userPhoto);
         }
 
         userPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+                int permissionCheck = ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE);
                 if(permissionCheck == PackageManager.PERMISSION_GRANTED){
                     startGallery();
                 }else{
@@ -191,19 +190,23 @@ public class FragmentSignIn extends Fragment implements OnTaskCompletedSignIn {
     @Override
     public void onTaskComplete(String status,String username,String surname,String nick,String email,String password,String date,boolean nameIsVisible) {
 
-        if(status.equals("Successful sign in")){
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction;
-            if (fragmentManager != null) {
-                fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, new FragmentLogin(),"frag_login");
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        }else if(status.equals("Something went wrong")){
-            Toast.makeText(getContext(),"Qualcosa è andato storto.Esiste già un account con questa email.",Toast.LENGTH_LONG).show();
-        }else if(status.equals("Nick already exists")){
-            Toast.makeText(getContext(),"Il nickname inserito esiste già.",Toast.LENGTH_LONG).show();
+        switch (status) {
+            case "Successful sign in":
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction;
+                if (fragmentManager != null) {
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, new FragmentLogin(), "frag_login");
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+                break;
+            case "Something went wrong":
+                Toast.makeText(getContext(), "Qualcosa è andato storto.Esiste già un account con questa email.", Toast.LENGTH_LONG).show();
+                break;
+            case "Nick already exists":
+                Toast.makeText(getContext(), "Il nickname inserito esiste già.", Toast.LENGTH_LONG).show();
+                break;
         }
 
     }
@@ -255,8 +258,14 @@ public class FragmentSignIn extends Fragment implements OnTaskCompletedSignIn {
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true);
 
-            Glide.with(getContext()).load(imageUri).apply(options).into(userPhoto);
+            Glide.with(mContext).load(imageUri).apply(options).into(userPhoto);
         }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 }
 

@@ -1,10 +1,12 @@
 package com.example.giramondo20app.Controller.DAO;
 
-import android.util.Log;
+
+
+
 
 import com.example.giramondo20app.Controller.DatabaseController;
 import com.example.giramondo20app.Model.UserModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 
 import java.io.ByteArrayInputStream;
 import java.sql.Blob;
@@ -22,7 +24,7 @@ public class MySQLUserDAO implements UserDAO {
         DatabaseController.connect();
         UserModel user = null;
         try {
-            CallableStatement call = DatabaseController.getConnection().prepareCall("SELECT NAME, SURNAME,BIRTHDAY, NICKNAME, EMAIL, PASSWORD,ISVISIBLENAME,FILEIMAGE,PHOTOAPPROVED FROM USER WHERE (EMAIL = ?) && (PASSWORD = ?)", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            CallableStatement call = DatabaseController.getConnection().prepareCall("SELECT NAME, SURNAME,BIRTHDAY, NICKNAME, EMAIL, ISVISIBLENAME,FILEIMAGE,PHOTOAPPROVED FROM USER WHERE (EMAIL = ?) AND (PASSWORD = SHA2(?,512))", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
             call.setString(1, email);
             call.setString(2, password);
             ResultSet rs = call.executeQuery();
@@ -35,10 +37,10 @@ public class MySQLUserDAO implements UserDAO {
                     Blob imageBlob = rs.getBlob("FileImage");
 
                     if(imageBlob == null) {
-                        user = new UserModel(rs.getString(1), rs.getString(2), userBirthday, rs.getString(4), rs.getString(5), rs.getString(6), rs.getBoolean(7));
+                        user = new UserModel(rs.getString(1), rs.getString(2), userBirthday, rs.getString(4), rs.getString(5), rs.getBoolean(6));
                     }else{
                         byte[] imageBytes = imageBlob.getBytes(1, (int) imageBlob.length());
-                        user = new UserModel(rs.getString(1), rs.getString(2), userBirthday, rs.getString(4), rs.getString(5), rs.getString(6), rs.getBoolean(7),imageBytes,rs.getBoolean(9));
+                        user = new UserModel(rs.getString(1), rs.getString(2), userBirthday, rs.getString(4), rs.getString(5), rs.getBoolean(6),imageBytes,rs.getBoolean(8));
                     }
                }
             }
@@ -54,7 +56,7 @@ public class MySQLUserDAO implements UserDAO {
         DatabaseController.connect();
         String status = "Something went wrong";
         try {
-            PreparedStatement ps = DatabaseController.getConnection().prepareStatement("INSERT IGNORE INTO USER(NAME,SURNAME,BIRTHDAY,NICKNAME,EMAIL,PASSWORD,ISVISIBLENAME,FILEIMAGE) VALUES(?,?,?,?,?,?,?,?)");
+            PreparedStatement ps = DatabaseController.getConnection().prepareStatement("INSERT IGNORE INTO USER(NAME,SURNAME,BIRTHDAY,NICKNAME,EMAIL,PASSWORD,ISVISIBLENAME,FILEIMAGE) VALUES(?,?,?,?,?,SHA2(?,512),?,?)");
             ps.setString(1, name);
             ps.setString(2, surname);
             ps.setDate(3, new java.sql.Date(bDay.getTime()));

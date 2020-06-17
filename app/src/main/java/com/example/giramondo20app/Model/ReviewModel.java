@@ -3,21 +3,22 @@ package com.example.giramondo20app.Model;
 import java.util.Date;
 
 public class ReviewModel {
-    int idReview;
-    float qualityPrice;
-	float position;
-	float cleaning;
-	float service;
-    float totalAmount;
-    String travelType;
-	String comment;
-	boolean approved;
-	String userId;
-	String acmName;
-	byte[] userImage;
-	byte[] acmImage;
-	Date dateReview;
-	boolean userPhotoApproved;
+
+    private int idReview;
+    private float qualityPrice;
+    private float position;
+    private float cleaning;
+    private float service;
+    private float totalAmount;
+    private String travelType;
+    private String comment;
+    private boolean approved;
+    private String userId;
+    private String acmName;
+    private byte[] userImage;
+    private byte[] acmImage;
+    private Date dateReview;
+    private boolean userPhotoApproved;
 
    public ReviewModel(int idReview, float qualityPrice, float position, float cleaning, float service, float totalAmount, String travelType, String comment,boolean approved) {
         this.idReview = idReview;

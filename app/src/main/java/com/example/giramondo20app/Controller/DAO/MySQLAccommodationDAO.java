@@ -41,7 +41,7 @@ public class MySQLAccommodationDAO implements AccommodationDAO {
         List<AccommodationModel> results = new ArrayList<>();
         DatabaseController.connect();
         try {
-            PreparedStatement ps = DatabaseController.getConnection().prepareStatement("SELECT DISTINCT ACCOMMODATIONTYPE,ADDRESS,CITY,DESCRIPTION,NAME,PHOTO,PRICE,RATING,SERVICES, STATE FROM ACCOMMODATION WHERE RATING >=4 GROUP BY STATE ORDER BY RATING");
+            PreparedStatement ps = DatabaseController.getConnection().prepareStatement("SELECT ACCOMMODATIONTYPE,ADDRESS,CITY,DESCRIPTION,NAME,PHOTO,PRICE,RATING,SERVICES, STATE FROM ACCOMMODATION WHERE RATING >=4  ORDER BY RATING DESC");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Blob imageBlob = rs.getBlob("Photo");

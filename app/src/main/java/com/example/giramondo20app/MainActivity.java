@@ -8,16 +8,19 @@ import androidx.fragment.app.FragmentTransaction;
 
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import android.util.Log;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -26,38 +29,39 @@ public class MainActivity extends AppCompatActivity {
     Dialog dialog;
     RelativeLayout logoLayout;
     boolean firstStart;
+
+    SharedPreferences prefs;
     SharedPreferences.Editor editor;
+
     Toolbar mToolbar;
+
+    View welcomeView;
+
+    FragmentHome fragmentHome;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         if (savedInstanceState == null) {
-            SharedPreferences prefs = getSharedPreferences("mypref", MODE_PRIVATE);
-            editor = prefs.edit();
 
+            prefs = getSharedPreferences("mypref", MODE_PRIVATE);
 
-            final FragmentHome fragmentHome = new FragmentHome();
+            fragmentHome = new FragmentHome();
 
             firstStart = prefs.getBoolean("show", true);
+
             if(firstStart) {
-                View view = getLayoutInflater().inflate(R.layout.welcome_dialog, null);
-                dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
-                dialog.setContentView(view);
-                dialog.show();
-                logoLayout = view.findViewById(R.id.logoLayout);
-                logoLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
 
-                        AsyncAccommodations task = new AsyncAccommodations(fragmentHome);
-                        task.execute();
+                welcomeView = getLayoutInflater().inflate(R.layout.welcome_dialog, null);
 
-                        dialog.dismiss();
-                    }
-                });
+                showWelcomeScreen();
+
+                getRecommendedAccommodations();
+
             }
 
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -73,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.ic_action_logo);
         getSupportActionBar().setTitle("GiraMondo");
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         if (item.getItemId() == android.R.id.home) {
             //Title bar back press triggers onBackPressed()
             onBackPressed();
@@ -94,15 +99,14 @@ public class MainActivity extends AppCompatActivity {
     //Both navigation bar back press and title bar back press will trigger this method
     @Override
     public void onBackPressed() {
-        //fragment to return from results research to filters without make the research again
+
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
             if (getSupportFragmentManager().getBackStackEntryCount() == 2) {
-                editor.putBoolean("show", false);
-                editor.commit();
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+
+                setWelcomeScreenVisible(false);
+
+                restartTheApp();
                 finish();
 
             }else if (f instanceof FragmentAccommodationOverview){
@@ -121,14 +125,32 @@ public class MainActivity extends AppCompatActivity {
 
                 ((FragmentReviewForm) f).onBackPressed();
 
+            }else if(f instanceof FragmentFilters){
+
+                ((FragmentFilters) f).onBackPressed();
+
+            }else if(f instanceof FragmentFilteredResearchResults){
+
+                ((FragmentFilteredResearchResults) f).onBackPressed();
+
+            }else if(f instanceof FragmentDestination){
+
+                ((FragmentDestination) f).onBackPressed();
+
             }else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
+
+                SharedPreferences pref = getSharedPreferences("loginData", Context.MODE_PRIVATE); //close user session
+                SharedPreferences.Editor editor = pref.edit();
+                editor.clear();
+                editor.commit();
 
                 finish();
 
             }else if(f instanceof FragmentHome || f instanceof FragmentFavorites){
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+
+                setWelcomeScreenVisible(false);
+
+                restartTheApp();
                 finish();
             }else{
 
@@ -136,88 +158,75 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private BottomNavigationView.OnNavigationItemSelectedListener navListener =
-                new BottomNavigationView.OnNavigationItemSelectedListener(){
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        Fragment selectedFragment= null;
-                        boolean home = false;
-                        switch (item.getItemId()){
-                            case R.id.nav_preferiti:
-                                bottomNav.getMenu().getItem(0).setCheckable(true);
+    private final BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                                SharedPreferences prefs = getSharedPreferences("loginData",MODE_PRIVATE);
-                                String userEmailLogged = prefs.getString("email","");
+                    Fragment selectedFragment = null;
+                    boolean home = false;
 
-                                selectedFragment= new FragmentFavorites();
+                    switch (item.getItemId()) {
 
-                                AsyncFavouriteAccommodations task = new AsyncFavouriteAccommodations((FragmentFavorites)selectedFragment);
-                                task.execute(userEmailLogged);
-                                break;
-                            case R.id.nav_home:
-                                selectedFragment= new FragmentHome();
-                                home = true;
-                                break;
-                            case R.id.nav_account:
-                                String emailStored, passwordStored, usernameStored, surnameStored,nicknameStored,birthdayStored,userImageStored;
-                                boolean nameIsVisibleStored,photoApprovedStored;
-                                SharedPreferences pref = getSharedPreferences("loginData",MODE_PRIVATE);
+                        case R.id.nav_preferiti:
 
-                                emailStored = pref.getString("email",null);
-                                passwordStored = pref.getString("password",null);
-                                usernameStored = pref.getString("username",null);
-                                surnameStored = pref.getString("surname",null);
-                                nicknameStored = pref.getString("nick",null);
-                                birthdayStored = pref.getString("birthday",null);
-                                nameIsVisibleStored = pref.getBoolean("name_is_visible",false);
-                                userImageStored = pref.getString("userimage",null);
-                                photoApprovedStored = pref.getBoolean("photo_approved",false);
+                            bottomNav.getMenu().getItem(0).setCheckable(true);
 
-                                if(emailStored == null) {
-                                    selectedFragment = new FragmentAccount();
-                                }else{
-                                    selectedFragment = new FragmentProfile(usernameStored,surnameStored,nicknameStored,birthdayStored,emailStored,passwordStored,nameIsVisibleStored,retrieveUserImage(userImageStored),photoApprovedStored);
-                                }
-                                break;
-                        }
-                        if(selectedFragment != null && !home) {
+                            selectedFragment = new FragmentFavorites();
 
-                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            getUserListFavorites(selectedFragment);
 
-                            if(selectedFragment instanceof FragmentProfile){
+                            break;
+                        case R.id.nav_home:
 
-                                fragmentTransaction.replace(R.id.fragment_container, selectedFragment,"frag_profile");
-                                fragmentTransaction.addToBackStack("frag_profile");
+                            selectedFragment = new FragmentHome();
+                            home = true;
 
-                            }else if(selectedFragment instanceof FragmentFavorites) {
+                            break;
+                        case R.id.nav_account:
 
-                                fragmentTransaction.replace(R.id.fragment_container, selectedFragment, "frag_fav");
-                                fragmentTransaction.addToBackStack("frag_profile");
+                            selectedFragment = restoreUserSessionIfLoggedIn(selectedFragment);
 
-                            }else{
-                                fragmentTransaction.replace(R.id.fragment_container, selectedFragment);
-                            }
-                            fragmentTransaction.commit();
-
-                        }else if(selectedFragment != null && home){
-                            editor.putBoolean("show", false);
-                            editor.commit();
-                            Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        }
-                        return true;
+                            break;
                     }
-                };
+                    if (selectedFragment != null && !home) {
+
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+                        if (selectedFragment instanceof FragmentProfile) {
+
+                            fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+                            fragmentTransaction.replace(R.id.fragment_container, selectedFragment, "frag_profile");
+                            fragmentTransaction.addToBackStack("frag_profile");
+
+                        } else if (selectedFragment instanceof FragmentFavorites) {
+
+                            fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+                            fragmentTransaction.replace(R.id.fragment_container, selectedFragment, "frag_fav");
+                            fragmentTransaction.addToBackStack("frag_profile");
+
+                        } else {
+                            fragmentTransaction.replace(R.id.fragment_container, selectedFragment);
+                        }
+
+                        fragmentTransaction.commit();
+
+                    } else if (selectedFragment != null && home) {
+
+                        setWelcomeScreenVisible(false);
+
+                        restartTheApp();
+                        finish();
+                    }
+                    return true;
+                }
+            };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferences prefs = getSharedPreferences("mypref", MODE_PRIVATE);
-        editor = prefs.edit();
-        editor.putBoolean("show", true);
-        editor.commit();
+
+        setWelcomeScreenVisible(true);
     }
 
 
@@ -231,7 +240,75 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void restartTheApp(){
+        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void showWelcomeScreen(){
+
+        dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
+        dialog.setContentView(welcomeView);
+        dialog.show();
+    }
+
+    public void setWelcomeScreenVisible(boolean visible){
+
+        prefs = getSharedPreferences("mypref", MODE_PRIVATE);
+        editor = prefs.edit();
+        editor.putBoolean("show", visible);
+        editor.commit();
+    }
+
+
+
+    private void getRecommendedAccommodations(){
+
+        logoLayout = welcomeView.findViewById(R.id.logoLayout);
+        logoLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AsyncAccommodations task = new AsyncAccommodations(fragmentHome);
+                task.execute();
+
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void getUserListFavorites(Fragment selectedFragment){
+        SharedPreferences prefs = getSharedPreferences("loginData",MODE_PRIVATE);
+        String userEmailLogged = prefs.getString("email","");
+        AsyncFavouriteAccommodations task = new AsyncFavouriteAccommodations((FragmentFavorites)selectedFragment);
+        task.execute(userEmailLogged);
+    }
+
+    private Fragment restoreUserSessionIfLoggedIn(Fragment selectedFragment){
+        String emailStored, usernameStored, surnameStored,nicknameStored,birthdayStored,userImageStored;
+        boolean nameIsVisibleStored,photoApprovedStored;
+        SharedPreferences pref = getSharedPreferences("loginData",MODE_PRIVATE);
+
+        emailStored = pref.getString("email",null);
+        usernameStored = pref.getString("username",null);
+        surnameStored = pref.getString("surname",null);
+        nicknameStored = pref.getString("nick",null);
+        birthdayStored = pref.getString("birthday",null);
+        nameIsVisibleStored = pref.getBoolean("name_is_visible",false);
+        userImageStored = pref.getString("userimage",null);
+        photoApprovedStored = pref.getBoolean("photo_approved",false);
+
+        if(emailStored == null) {
+            selectedFragment = new FragmentAccount();
+        }else{
+            selectedFragment = new FragmentProfile(usernameStored,surnameStored,nicknameStored,birthdayStored,emailStored,nameIsVisibleStored,retrieveUserImage(userImageStored),photoApprovedStored);
+        }
+        return selectedFragment;
+    }
+
     public byte[] retrieveUserImage(String stringArray){
+
         byte[] array = null;
         if(stringArray != null){
             String[] split = stringArray.substring(1,stringArray.length()-1).split(", ");

@@ -1,6 +1,7 @@
 package com.example.giramondo20app;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.giramondo20app.Controller.DAO.AccommodationDAO;
 import com.example.giramondo20app.Controller.DAO.MySQLAccommodationDAO;
@@ -25,6 +26,7 @@ public class AsyncHotels extends AsyncTask<Void,Void, List<AccommodationModel>> 
         this.travelType = travelType;
         this.subCategory = subCategory;
         city = cityNameByPosition;
+        Log.d("luisa",city);
     }
 
     AsyncHotels(OnTaskCompletedResearchResults listener, String cityName){

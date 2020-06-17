@@ -11,16 +11,19 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
@@ -43,6 +46,9 @@ public class FragmentFilters extends Fragment {
     private int buttonPressed;
     private String cityName;
 
+    private Animation animRotate;
+    Bundle bundle;
+
     private FragmentFilteredResearchResults fragRes= new FragmentFilteredResearchResults();
 
     @Override
@@ -51,9 +57,10 @@ public class FragmentFilters extends Fragment {
 
         setHasOptionsMenu(true);
 
-        Bundle bundle = getArguments();
-        if(bundle != null)
-            cityName = bundle.getString("cityName","");
+        bundle = getArguments();
+        if(bundle != null) {
+            cityName = bundle.getString("cityName", "");
+        }
     }
 
     @Override
@@ -65,7 +72,7 @@ public class FragmentFilters extends Fragment {
         myseekBar = view.findViewById(R.id.seekBar);
         mytextView = view.findViewById(R.id.textView1);
         myRatingBar = view.findViewById(R.id.ratingBar2);
-        Button myButton = view.findViewById(R.id.buttonFind);
+        final Button myButton = view.findViewById(R.id.buttonFind);
 
         myspinner = view.findViewById(R.id.spinner);
         radioGroup = view.findViewById(R.id.radioGroup);
@@ -73,6 +80,8 @@ public class FragmentFilters extends Fragment {
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setProgressViewOffset(false,10,100);
+
+        animRotate = AnimationUtils.loadAnimation(getContext(),R.anim.rotate);
 
         myseekBar.setMax(500);
         setSpinner(buttonPressed);
@@ -134,14 +143,14 @@ public class FragmentFilters extends Fragment {
             @Override
             public void onClick(View v) {
                 setRadioButton();
-                AsyncAccommodations(priceRange,myRating,travelType,clickedItem,cityName);
+
+                AsyncAccommodations(priceRange, myRating, travelType, clickedItem, cityName);
                 resetValues();
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction;
                 if (fragmentManager != null) {
                     fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.fragment_container, fragRes);
-                    fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                 }
 
@@ -221,21 +230,51 @@ public class FragmentFilters extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull final Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.refresh_menu,menu);
+        ImageView imgRefresh = new ImageView(getContext());
+        imgRefresh.setPadding(0,0,15,0);
+        if(imgRefresh != null){
+            imgRefresh.setImageResource(R.drawable.ic_refresh_26dp);
+        }
+        menu.findItem(R.id.option_refresh).setActionView(imgRefresh);
+        imgRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.startAnimation(animRotate);
+
+                myRatingBar.setRating(0F);
+                radioGroup.clearCheck();
+                myseekBar.setProgress(0);
+                myspinner.setSelection(0);
+            }
+        });
         super.onCreateOptionsMenu(menu, inflater);
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.option_refresh){
-            myRatingBar.setRating(0F);
-            radioGroup.clearCheck();
-            myseekBar.setProgress(0);
-            myspinner.setSelection(0);
+
             return true;
         }else{
             return super.onOptionsItemSelected(item);
+        }
+    }
+
+    void onBackPressed(){
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fr = fragmentManager.beginTransaction();
+        fr.replace(R.id.fragment_container,fragmentManager.findFragmentByTag("frag_home"));
+        fr.commit();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        bundle = getArguments();
+        if (bundle != null) {
+            cityName = bundle.getString("cityName", "");
         }
     }
 }

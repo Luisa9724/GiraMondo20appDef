@@ -147,6 +147,7 @@ public class FragmentAccommodationOverview extends Fragment implements OnTaskCom
     public void setupViewPager(ViewPager viewpage,AccommodationModel selectedAccommodation){
 
         SharedPreferences pref = getActivity().getSharedPreferences("acm", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
 
 
         boolean firstCallStored = pref.getBoolean("firstCall",false);
@@ -166,6 +167,9 @@ public class FragmentAccommodationOverview extends Fragment implements OnTaskCom
             if(!(results.isEmpty())) {
                 mRecyclerView.setAdapter(mAdapter);
             }
+
+            editor.putBoolean("firstCall",false);
+            editor.commit();
         }else { //only to first call of this method
 
             fragInfo = new FragmentAccommodationInfo();
@@ -175,6 +179,7 @@ public class FragmentAccommodationOverview extends Fragment implements OnTaskCom
 
         bundle = new Bundle();
         bundle.putSerializable("selectedAccommodation", selectedAccommodation);
+
         fragInfo.setArguments(bundle);
         fragMap.setArguments(bundle);
         fragReviews.setArguments(bundle);
@@ -263,11 +268,15 @@ public class FragmentAccommodationOverview extends Fragment implements OnTaskCom
     public void onBackPressed(){
         FragmentManager fragmentManager = getFragmentManager();
 
-        if(fragmentManager.findFragmentByTag("frag_fav")!=null){
-            fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getId(),FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction fr = fragmentManager.beginTransaction();
+        fr.setCustomAnimations(R.anim.slide_in_left,R.anim.slide_out_right);
+        if(getFragmentManager().findFragmentByTag("frag_filters") != null) {
+            fr.replace(R.id.fragment_container, getFragmentManager().findFragmentByTag("frag_filters"));
+            fr.commit();
+        }else{
+            fr.replace(R.id.fragment_container,getFragmentManager().findFragmentByTag("frag_home"));
+            fr.commit();
         }
-
-        fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-2).getId(),FragmentManager.POP_BACK_STACK_INCLUSIVE);
         ((MainActivity)getActivity()).showToolbar();
     }
 

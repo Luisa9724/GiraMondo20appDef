@@ -11,10 +11,13 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.ScaleAnimation;
 import android.widget.Toast;
 
 import com.example.giramondo20app.Model.AccommodationModel;
@@ -28,8 +31,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class FragmentReviews extends Fragment {
 
-AccommodationModel accommodation;
-RecyclerView reviewRv;
+private AccommodationModel accommodation;
+private RecyclerView reviewRv;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,23 +50,34 @@ RecyclerView reviewRv;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        FloatingActionButton fab = view.findViewById(R.id.fab);
+        final FloatingActionButton fab = view.findViewById(R.id.fab);
         reviewRv = view.findViewById(R.id.reviewList);
 
-        AsyncReviews task = new AsyncReviews(this);
-        task.execute(accommodation.getName());
+        if(accommodation != null) {
+            AsyncReviews task = new AsyncReviews(this);
+            task.execute(accommodation.getName());
+        }
+
+        final ScaleAnimation scaleAnimation = new ScaleAnimation(0.7f,1.0f,0.7f,1.0f, Animation.RELATIVE_TO_SELF,0.7f,Animation.RELATIVE_TO_SELF,0.7f);
+        scaleAnimation.setDuration(500);
+        BounceInterpolator bounceInterpolator = new BounceInterpolator();
+        scaleAnimation.setInterpolator(bounceInterpolator);
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                fab.startAnimation(scaleAnimation);
+
                 String emailStored;
                 SharedPreferences pref = getActivity().getSharedPreferences("loginData",MODE_PRIVATE);
-                SharedPreferences.Editor editor = pref.edit();
                 emailStored = pref.getString("email","");
                 if(emailStored.isEmpty()) {
                     Toast.makeText(getContext(),"Effettua prima il login.",Toast.LENGTH_LONG).show();
                 }else if(accommodation != null) {
                     FragmentTransaction fr = getParentFragment().getFragmentManager().beginTransaction();
+                    fr.setCustomAnimations(R.anim.slide_in_left,R.anim.slide_out_right);
                     fr.replace(R.id.fragment_container, new FragmentReviewForm(accommodation),"frag_rev_form");
                     fr.addToBackStack(null);
                     fr.commit();

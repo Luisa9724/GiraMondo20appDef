@@ -9,8 +9,8 @@ import com.example.giramondo20app.Model.UserModel;
 public class AsyncUserNameVisible extends AsyncTask<UserModel,Void,String> {
 
     OnTaskCompletedUserProfile listener;
-    boolean nameIsVisibleLoggedUser;
-    String userEmailLogged;
+    private boolean nameIsVisibleLoggedUser;
+    private String userEmailLogged;
 
     AsyncUserNameVisible(OnTaskCompletedUserProfile listener,boolean nameIsVisibleLoggedUser,String userEmailLogged){
         this.listener = listener;
@@ -20,8 +20,8 @@ public class AsyncUserNameVisible extends AsyncTask<UserModel,Void,String> {
 
     @Override
     protected String doInBackground(UserModel... userModels) {
-        UserDAO userSQL = new MySQLUserDAO();
-        return userSQL.setNameIsVisible(nameIsVisibleLoggedUser,userEmailLogged);
+
+        return setIfNameIsVisible(nameIsVisibleLoggedUser,userEmailLogged);
     }
 
     @Override
@@ -29,5 +29,12 @@ public class AsyncUserNameVisible extends AsyncTask<UserModel,Void,String> {
         if(listener !=null){
             listener.onTaskCompletedNameIsVisible(response);
         }
+    }
+
+    private String setIfNameIsVisible(boolean nameIsVisible, String userEmail){
+        String response;
+        UserDAO userSQL = new MySQLUserDAO();
+        response = userSQL.setNameIsVisible(nameIsVisible,userEmail);
+        return response;
     }
 }

@@ -2,6 +2,7 @@ package com.example.giramondo20app;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -19,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.giramondo20app.Model.AccommodationModel;
 
@@ -101,7 +101,7 @@ public class FragmentFilteredResearchResults extends Fragment implements OnTaskC
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, fragOverview,"frag_overview");
-                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.addToBackStack("frag_overview");
                 fragmentTransaction.commit();
             }
         });
@@ -157,5 +157,13 @@ public class FragmentFilteredResearchResults extends Fragment implements OnTaskC
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    void onBackPressed(){
+        setHasOptionsMenu(false);
+        FragmentManager fragmentManager = getFragmentManager();
+        if(fragmentManager.findFragmentByTag("frag_des") != null){
+            fragmentManager.beginTransaction().replace(R.id.fragment_container,fragmentManager.findFragmentByTag("frag_des")).commit();
+        }
     }
 }

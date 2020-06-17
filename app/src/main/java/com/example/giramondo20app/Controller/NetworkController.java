@@ -9,7 +9,7 @@ import android.net.NetworkCapabilities;
 import com.example.giramondo20app.MainActivity;
 
 public class NetworkController {
-    MainActivity activity;
+    private MainActivity activity;
 
     public NetworkController(Activity activity) {
         this.activity = (MainActivity) activity;
@@ -23,9 +23,8 @@ public class NetworkController {
             if(capabilities != null) {
                 if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
                     return true;
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    return true;
-                }
+                } else
+                    return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
             }
         }
 

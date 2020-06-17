@@ -12,7 +12,7 @@ import com.example.giramondo20app.MainActivity;
 
 public class GPSController {
 
-    MainActivity activity;
+    private MainActivity activity;
 
     public GPSController(Activity activity) {
         this.activity = (MainActivity) activity;
@@ -21,7 +21,7 @@ public class GPSController {
     //show dialog to able/disable GPS service
     public void buildAlertMessageIfNoGps() {
         final LocationManager manager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { //check the Gps service
+        if (manager != null && !manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { //check the Gps service
             final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setMessage("Il tuo GPS sembra essere disabilitato, vuoi abilitarlo?")
                     .setCancelable(false)

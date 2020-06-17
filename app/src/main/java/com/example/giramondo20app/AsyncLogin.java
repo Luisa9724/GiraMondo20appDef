@@ -1,6 +1,8 @@
 package com.example.giramondo20app;
 
 import android.os.AsyncTask;
+import android.util.Log;
+
 
 import com.example.giramondo20app.Controller.DAO.MySQLUserDAO;
 import com.example.giramondo20app.Controller.DAO.UserDAO;
@@ -8,9 +10,6 @@ import com.example.giramondo20app.Model.UserModel;
 
 public class AsyncLogin extends AsyncTask<String,Void, UserModel> {
 
-    private String email;
-    private String password;
-    private UserModel user;
     private OnTaskCompletedLogin listener;
 
     AsyncLogin(OnTaskCompletedLogin listener){
@@ -19,16 +18,16 @@ public class AsyncLogin extends AsyncTask<String,Void, UserModel> {
 
     @Override
     protected UserModel doInBackground(String... strings) {
-       email = strings[0];
-       password = strings[1];
+        String email = strings[0];
+        String password = strings[1];
 
         UserDAO userSQL = new MySQLUserDAO();
-       return user = userSQL.getUserByEmailAndPassword(email,password);
+       return  userSQL.getUserByEmailAndPassword(email, password);
     }
 
     @Override
     protected void onPostExecute(UserModel result) {
-        if(result != null && listener !=null)
+        if(listener !=null)
             listener.onTaskComplete(result);
     }
 }

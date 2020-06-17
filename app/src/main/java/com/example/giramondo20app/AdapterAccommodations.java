@@ -67,5 +67,10 @@ public class AdapterAccommodations extends ArrayAdapter<AccommodationModel> {
 
         return listItem;
     }
+
+    @Override
+    public int getCount() {
+        return accommodationsList.size();
+    }
 }
 

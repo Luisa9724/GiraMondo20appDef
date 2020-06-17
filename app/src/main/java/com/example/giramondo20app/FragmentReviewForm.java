@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,27 +27,26 @@ import static android.content.Context.MODE_PRIVATE;
 public class FragmentReviewForm extends Fragment {
 
 
-    AccommodationModel accommodation;
-    String accommodationName;
-    Integer idReview;
+    private AccommodationModel accommodation;
+    private String accommodationName;
+    private Integer idReview;
 
-    RatingBar ratingBarQuality;
-    RatingBar ratingBarPosition;
+    private RatingBar ratingBarQuality;
+    private RatingBar ratingBarPosition;
     RatingBar ratingBarCleaning;
-    RatingBar ratingBarService;
-    RadioGroup radioGroup;
-    EditText etComment;
-    Button btnConfirm;
+    private RatingBar ratingBarService;
+    private RadioGroup radioGroup;
+    private EditText etComment;
 
-    String travelType;
-    String comment;
+    private String travelType;
+    private String comment;
 
-    float ratingQuality = 0F;
-    float ratingPosition = 0F;
-    float ratingCleaning = 0F;
-    float ratingService = 0F;
+    private float ratingQuality = 0F;
+    private float ratingPosition = 0F;
+    private float ratingCleaning = 0F;
+    private float ratingService = 0F;
 
-    String acmName;
+    private String acmName;
 
     FragmentReviewForm(int idReview,String acmName){this.idReview = idReview; this.acmName = acmName;}
 
@@ -71,14 +69,13 @@ public class FragmentReviewForm extends Fragment {
         ratingBarService = view.findViewById(R.id.ratingbar_service);
         radioGroup = view.findViewById(R.id.radioGroup_reviews);
         etComment = view.findViewById(R.id.write_review);
-        btnConfirm = view.findViewById(R.id.confirm_btn);
+        Button btnConfirm = view.findViewById(R.id.confirm_btn);
 
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String emailStored;
                 SharedPreferences pref = getActivity().getSharedPreferences("loginData", MODE_PRIVATE);
-                SharedPreferences.Editor editor = pref.edit();
                 emailStored = pref.getString("email", "");
 
                 if (emailStored.isEmpty()) {
@@ -86,7 +83,7 @@ public class FragmentReviewForm extends Fragment {
                 } else {
                     ratingQuality = ratingBarQuality.getRating();
                     ratingPosition = ratingBarPosition.getRating();
-                    ratingCleaning = ratingBarPosition.getRating();
+                    ratingCleaning = ratingBarCleaning.getRating();
                     ratingService = ratingBarService.getRating();
 
                     setRadioButton();
@@ -109,7 +106,11 @@ public class FragmentReviewForm extends Fragment {
                                 AsyncReviewForm task = new AsyncReviewForm((FragmentAccommodationOverview) getFragmentManager().findFragmentByTag("frag_overview"),accommodationName, emailStored, comment, travelType, ratingQuality, ratingPosition, ratingCleaning, ratingService);
                                 task.execute();
                                 FragmentTransaction fr = getFragmentManager().beginTransaction();
-                                fr.replace(R.id.fragment_container, getFragmentManager().findFragmentByTag("frag_overview"));
+                                if(getFragmentManager().findFragmentByTag("frag_overview") != null) {
+                                    fr.replace(R.id.fragment_container, getFragmentManager().findFragmentByTag("frag_overview"));
+                                }else {
+                                    fr.replace(R.id.fragment_container, new FragmentAccommodationOverview());
+                                }
                                 fr.commit();
                             }else if(accommodationName != null && idReview !=null){ //update review already written
                                 if(getFragmentManager().findFragmentByTag("frag_user_rev") != null) {
@@ -149,6 +150,7 @@ public class FragmentReviewForm extends Fragment {
         editor.putBoolean("firstCall",true); //when press back button turn back to accommodation info where three tabs have to be shown again so the first call is already done
         editor.commit();
         FragmentTransaction fr = getFragmentManager().beginTransaction();
+        fr.setCustomAnimations(R.anim.slide_in_left,R.anim.slide_out_right);
         fr.replace(R.id.fragment_container, getFragmentManager().findFragmentByTag("frag_overview"));
         fr.commit();
     }

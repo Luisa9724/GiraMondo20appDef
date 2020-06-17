@@ -4,23 +4,17 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -37,18 +31,11 @@ import com.example.giramondo20app.Controller.NetworkController;
 import com.example.giramondo20app.Model.AccommodationModel;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -72,16 +59,14 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,View.OnClickListener, OnTaskCompletedSearchAccommodationByName {
 
-    GoogleMap map; // GoogleMap is the main class of the Maps API and is responsible for handling important operations such as connecting to the Google Maps service, downloading map tiles, and responding to user interactions
-    SupportMapFragment mapFragment;
-    FragmentFilters fragFilters;
-    Bundle bundleCity;
-    String TAG="FragmentDestination";
+    private GoogleMap map; // GoogleMap is the main class of the Maps API and is responsible for handling important operations such as connecting to the Google Maps service, downloading map tiles, and responding to user interactions
+    private FragmentFilters fragFilters;
+    private Bundle bundleCity;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    FusedLocationProviderClient mFusedLocationClient;
-    LocationCallback mlocationCallback;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mlocationCallback;
 
 
     Marker mLocationMarker;
@@ -90,22 +75,35 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
     private static final long TIME_INTERVAL_GET_LOCATION = 1000 * 5; // 1 Minute
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 5000;
 
-    SearchView searchView;
-    ImageButton buttonRestaurant;
-    ImageButton buttonHotel;
-    ImageButton buttonAttraction;
-    boolean pushedButton = false;
+    private SearchView searchView;
+    private boolean pushedButton = false;
 
-    GPSController gpsController;
-    NetworkController ntw;
+    private GPSController gpsController;
+    private NetworkController ntw;
+
+    Context mContext;
+
+    String locationHome;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         ntw = new NetworkController(getActivity());
         gpsController = new GPSController(getActivity());
         if(ntw.isNetworkConnected() && ntw.internetIsConnected())
             gpsController.buildAlertMessageIfNoGps();
+
+        if(getArguments()!= null && getArguments().getBoolean("pushedButton"))
+            pushedButton = getArguments().getBoolean("pushedButton");
+
+        if(!pushedButton) {
+            locationHome = getArguments().getString("location");
+            if (!locationHome.equals("")) {
+                bundleCity = new Bundle();
+                bundleCity.putString("cityName", locationHome);
+            }
+        }
     }
 
     @Override
@@ -113,10 +111,10 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_destination, container, false);
         searchView  = view.findViewById(R.id.sv_location);
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
-        buttonRestaurant = view.findViewById(R.id.buttonRestaurant);
-        buttonHotel = view.findViewById(R.id.buttonHotel);
-        buttonAttraction = view.findViewById(R.id.buttonAttraction);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map);
+        ImageButton buttonRestaurant = view.findViewById(R.id.buttonRestaurant);
+        ImageButton buttonHotel = view.findViewById(R.id.buttonHotel);
+        ImageButton buttonAttraction = view.findViewById(R.id.buttonAttraction);
 
         if(mapFragment == null){
             FragmentManager fm=getFragmentManager();
@@ -135,7 +133,9 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
 
                 if (ntw.isNetworkConnected() && ntw.internetIsConnected()) {
                     gpsController.buildAlertMessageIfNoGps();
-                map.clear();
+
+                    map.clear();
+
                 if(mFusedLocationClient != null && mlocationCallback != null)
                     mFusedLocationClient.removeLocationUpdates(mlocationCallback);
 
@@ -148,18 +148,18 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
                     }catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Address address = addressList.get(0);
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    map.addMarker(new MarkerOptions().position(latLng).title(location));
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+                    Address address;
+                    if (addressList != null) {
+                        address = addressList.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        map.addMarker(new MarkerOptions().position(latLng).title(location));
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    }
                 }
 
                 if(!location.equals("")) {
                     bundleCity = new Bundle();
-                    if (fragFilters == null)
-                        fragFilters = new FragmentFilters();
                     bundleCity.putString("cityName", location);
-                    fragFilters.setArguments(bundleCity);
                 }
 
                 }else{
@@ -187,18 +187,15 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
         buttonAttraction.setOnClickListener(this);
 
 //if click on the button "use the current position" check the permission and show the current user position
-        if(getArguments()!= null && getArguments().getBoolean("pushedButton") == true)
-            pushedButton = getArguments().getBoolean("pushedButton");
-
-        if(pushedButton== true) {
-            TedPermission.with(getActivity())
+        if(pushedButton) {
+            TedPermission.with(mContext)
                     .setPermissionListener(permissionlistener)
                     .setDeniedMessage("Se rifiuta l'autorizzazione,non potrà usare il servizio\n\nPer favore, abiliti i permessi in [Impostazioni] > [Autorizzazioni]")
                     .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
                     .check();
 
             /*Use the GoogleApiClient.Builder class to create an instance of the Google Play Services API client*/
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+            mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
@@ -211,6 +208,7 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        String TAG = "FragmentDestination";
         Log.d(TAG, "onMapReady");
 
         map.getUiSettings().setZoomControlsEnabled(false);
@@ -222,14 +220,6 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
         map.getUiSettings().setRotateGesturesEnabled(true);
 
         if(!pushedButton) {
-            String locationHome = getArguments().getString("location");
-            if(!locationHome.equals("")) {
-                bundleCity = new Bundle();
-                if (fragFilters == null)
-                    fragFilters = new FragmentFilters();
-                bundleCity.putString("cityName", locationHome);
-                fragFilters.setArguments(bundleCity);
-            }
             List<Address> addressList = null;
             if (locationHome != null || locationHome.equals("")) {
                 Geocoder geocoder = new Geocoder(getActivity());
@@ -238,22 +228,29 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Address address = addressList.get(0);
-                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                map.addMarker(new MarkerOptions().position(latLng).title(locationHome));
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                Address address;
+                if (addressList != null) {
+                    address = addressList.get(0);
+
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                    map.addMarker(new MarkerOptions().position(latLng).title(locationHome));
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                }
             }
         }
     }
 
 
-    PermissionListener permissionlistener = new PermissionListener() {
+
+    private PermissionListener permissionlistener = new PermissionListener() {
         @Override
         public void onPermissionGranted() {
             // Create the LocationRequest object
             mLocationRequest = LocationRequest.create()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(TIME_INTERVAL_GET_LOCATION)    // 3 seconds, in milliseconds
+                    .setExpirationDuration(10000)
                     .setFastestInterval(TIME_INTERVAL_GET_LOCATION); // 1 second, in milliseconds
 
             // Connect to Google Play Services, by calling the connect() method
@@ -269,15 +266,15 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
 
     /* If the connect request is completed successfully, the onConnected(Bundle) method will be invoked and any queued items will be executed*/
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
+    public void onConnected(@Nullable final Bundle bundle) {
         // If your app does have access to COARSE_LOCATION && FINE_LOCATION, then this method will return PackageManager.PERMISSION_GRANTED
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             return;
         }
         // Retrieve the user’s last known location
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
         mlocationCallback = new LocationCallback(){
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -290,12 +287,11 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
 
                     try {
                         List<Address> address = new Geocoder(getActivity(), Locale.getDefault()).getFromLocation(locationData.getLatitude(),locationData.getLongitude(),1);
-                        String cityName = address.get(0).getLocality();
+                        String cityNameMyPos = address.get(0).getLocality();
 
-                        fragFilters = new FragmentFilters();
                         bundleCity = new Bundle();
-                        bundleCity.putString("cityName",cityName);
-                        fragFilters.setArguments(bundleCity);
+
+                        bundleCity.putString("cityName",cityNameMyPos);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -322,7 +318,7 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-        if (connectionResult.hasResolution() && getActivity() instanceof Activity) {
+        if (connectionResult.hasResolution() && mContext instanceof Activity) {
             try {
                 Activity activity = getActivity();
                 connectionResult.startResolutionForResult(activity, CONNECTION_FAILURE_RESOLUTION_REQUEST);
@@ -366,13 +362,22 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
 
             FragmentTransaction fragmentTransaction;
             if (getFragmentManager() != null) {
-                FragmentAccommodationOverview fragOverview = new FragmentAccommodationOverview();
-                fragmentTransaction = getFragmentManager().beginTransaction();
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("acm_fav", result);
-                fragOverview.setArguments(bundle);
-                fragmentTransaction.replace(R.id.fragment_container, fragOverview);
-                fragmentTransaction.commit();
+                if(getFragmentManager().findFragmentByTag("frag_overview")== null) {
+                    FragmentAccommodationOverview fragOverview = new FragmentAccommodationOverview();
+                    fragmentTransaction = getFragmentManager().beginTransaction();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("acm_fav", result);
+                    fragOverview.setArguments(bundle);
+                    fragmentTransaction.replace(R.id.fragment_container, fragOverview);
+                    fragmentTransaction.commit();
+                }else{
+                    fragmentTransaction = getFragmentManager().beginTransaction();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("acm_fav", result);
+                    getFragmentManager().findFragmentByTag("frag_overview").setArguments(bundle);
+                    fragmentTransaction.replace(R.id.fragment_container, getFragmentManager().findFragmentByTag("frag_overview"));
+                    fragmentTransaction.commit();
+                }
             }
         }
     }
@@ -385,10 +390,21 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
         if(fragFilters == null)
             fragFilters = new FragmentFilters();
 
-            fragmentTransaction.replace(R.id.fragment_container, fragFilters);
+        if(fragmentManager.findFragmentByTag("frag_filters") == null) {
+            fragFilters.setArguments(bundleCity);
+            fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+            fragmentTransaction.replace(R.id.fragment_container, fragFilters, "frag_filters");
             fragFilters.setButton(v.getId());
-            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.addToBackStack("frag_filters");
             fragmentTransaction.commit();
+        }else{
+            fragFilters.setArguments(bundleCity);
+            fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+            fragmentTransaction.remove(fragFilters);
+            fragmentTransaction.replace(R.id.fragment_container, fragmentManager.findFragmentByTag("frag_filters"));
+            ((FragmentFilters)fragmentManager.findFragmentByTag("frag_filters")).setButton(v.getId());
+            fragmentTransaction.commit();
+        }
     }
     @Override
     public void onPause() {
@@ -397,11 +413,38 @@ public class FragmentDestination extends Fragment implements OnMapReadyCallback,
             mFusedLocationClient.removeLocationUpdates(mlocationCallback);
     }
 
+
+
+
     @Override
     public void onResume() {
         super.onResume();
         searchView.setIconified(true);
         if(mFusedLocationClient != null)
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,mlocationCallback,null);
+
+        if(getArguments()!= null && getArguments().getBoolean("pushedButton"))
+            pushedButton = getArguments().getBoolean("pushedButton");
+
+        if(!pushedButton) {
+            locationHome = getArguments().getString("location");
+            if (!locationHome.equals("")) {
+                bundleCity = new Bundle();
+                bundleCity.putString("cityName", locationHome);
+            }
+        }
+    }
+
+    void onBackPressed(){
+        ((MainActivity)getActivity()).setWelcomeScreenVisible(false);
+
+        ((MainActivity)getActivity()).restartTheApp();
+         getActivity().finish();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 }
